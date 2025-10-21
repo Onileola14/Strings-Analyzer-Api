@@ -6,7 +6,7 @@ const {
   getAllStrings,
   filterByNaturalLanguage,
   deleteString
-} = require("../controllers/stringController");
+} = require("../controller/stringController");
 
 // keep specific/static routes before parameter routes
 router.post("/", createString);
