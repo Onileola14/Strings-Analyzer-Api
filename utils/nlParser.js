@@ -1,4 +1,58 @@
+// ...existing code...
+function parseNaturalLanguage(query) {
+  if (typeof query !== "string" || !query.trim()) {
+    throw new Error("Query must be a non-empty string");
+  }
 
+  const q = query.toLowerCase();
+  const parsed = {};
+
+  // single word / one-word
+  if (/\b(?:single[- ]?word|one[- ]?word)\b/.test(q)) {
+    parsed.word_count = 1;
+  }
+
+  // palindrome / palindromic
+  if (/\bpalindrom(?:e|ic)\b/.test(q)) {
+    parsed.is_palindrome = true;
+  }
+
+  // longer than N  -> min_length = N + 1 (strictly longer)
+  const longerMatch = q.match(/longer than (\d+)/i);
+  if (longerMatch) {
+    const n = parseInt(longerMatch[1], 10);
+    if (!Number.isNaN(n)) parsed.min_length = n + 1;
+  }
+
+  // shorter than N -> max_length = N - 1 (strictly shorter)
+  const shorterMatch = q.match(/shorter than (\d+)/i);
+  if (shorterMatch) {
+    const n = parseInt(shorterMatch[1], 10);
+    if (!Number.isNaN(n)) parsed.max_length = n - 1;
+  }
+
+  // containing a specific letter/character (single letter)
+  const containsMatch = q.match(/(?:containing the letter|containing|contains) ([a-z])/i);
+  if (containsMatch) {
+    parsed.contains_character = containsMatch[1].toLowerCase();
+  }
+
+  // "first vowel" heuristic -> map to 'a' (simple)
+  if (/\bfirst vowel\b/.test(q)) {
+    parsed.contains_character = parsed.contains_character || "a";
+  }
+
+  if (Object.keys(parsed).length === 0) {
+    const err = new Error("Unable to parse natural language query");
+    err.code = "UNPARSEABLE";
+    throw err;
+  }
+
+  return parsed;
+}
+
+module.exports = { parseNaturalLanguage };
+// ...existing code...
 function parseNaturalLanguage(query) {
   if (!query || typeof query !== "string") {
     throw new Error("Query must be a non-empty string");

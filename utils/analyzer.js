@@ -1,4 +1,55 @@
+// ...existing code...
+function sha256Hex(input) {
+  const crypto = require('crypto');
+  // ensure deterministic string serialization if hashing objects:
+  if (typeof input === 'object' && input !== null) {
+    input = JSON.stringify(sortObjectKeys(input));
+  }
+  return crypto.createHash('sha256').update(String(input), 'utf8').digest('hex');
+}
 
+function sortObjectKeys(obj) {
+  if (!obj || typeof obj !== 'object' || Array.isArray(obj)) return obj;
+  return Object.keys(obj).sort().reduce((acc, k) => {
+    acc[k] = sortObjectKeys(obj[k]);
+    return acc;
+  }, {});
+}
+// ...existing code...// ...existing code...
+function sha256Hex(input) {
+  const crypto = require('crypto');
+  // ensure deterministic string serialization if hashing objects:
+  if (typeof input === 'object' && input !== null) {
+    input = JSON.stringify(sortObjectKeys(input));
+  }
+  return crypto.createHash('sha256').update(String(input), 'utf8').digest('hex');
+}
+
+function sortObjectKeys(obj) {
+  if (!obj || typeof obj !== 'object' || Array.isArray(obj)) return obj;
+  return Object.keys(obj).sort().reduce((acc, k) => {
+    acc[k] = sortObjectKeys(obj[k]);
+    return acc;
+  }, {});
+}
+// ...existing code...// ...existing code...
+function sha256Hex(input) {
+  const crypto = require('crypto');
+  // ensure deterministic string serialization if hashing objects:
+  if (typeof input === 'object' && input !== null) {
+    input = JSON.stringify(sortObjectKeys(input));
+  }
+  return crypto.createHash('sha256').update(String(input), 'utf8').digest('hex');
+}
+
+function sortObjectKeys(obj) {
+  if (!obj || typeof obj !== 'object' || Array.isArray(obj)) return obj;
+  return Object.keys(obj).sort().reduce((acc, k) => {
+    acc[k] = sortObjectKeys(obj[k]);
+    return acc;
+  }, {});
+}
+// ...existing code...
 const crypto = require("crypto");
 
 /**
