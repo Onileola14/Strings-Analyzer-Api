@@ -8,10 +8,10 @@ async function createString(req, res) {
   try {
     const { value } = req.body;
     if (value === undefined || value === null) {
-      return res.status(422).json({ error: '"value" field is required' });
+      return res.status(400).json({ error: '"value" field is required' });
     }
     if (typeof value !== "string") {
-      return res.status(422).json({ error: '"value" must be a string' });
+      return res.status(400).json({ error: '"value" must be a string' });
     }
 
     const properties = analyze(value);
@@ -40,7 +40,7 @@ async function createString(req, res) {
     });
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ error: err.message });
+    return res.status(401).json({ error: err.message });
   }
 }
 
@@ -65,7 +65,7 @@ async function getStringByValue(req, res) {
     });
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ error: err.message });
+    return res.status(401).json({ error: err.message });
   }
 }
 
@@ -93,32 +93,32 @@ async function getAllStrings(req, res) {
 
     if (is_palindrome !== undefined) {
       if (is_palindrome !== "true" && is_palindrome !== "false") {
-        return res.status(422).json({ error: "is_palindrome must be true or false" });
+        return res.status(401).json({ error: "is_palindrome must be true or false" });
       }
       q["properties.is_palindrome"] = is_palindrome === "true";
     }
 
     if (min_length !== undefined) {
       const n = parseInt(min_length, 10);
-      if (Number.isNaN(n)) return res.status(422).json({ error: "min_length must be integer" });
+      if (Number.isNaN(n)) return res.status(401).json({ error: "min_length must be integer" });
       q["properties.length"] = Object.assign(q["properties.length"] || {}, { $gte: n });
     }
 
     if (max_length !== undefined) {
       const n = parseInt(max_length, 10);
-      if (Number.isNaN(n)) return res.status(422).json({ error: "max_length must be integer" });
+      if (Number.isNaN(n)) return res.status(401).json({ error: "max_length must be integer" });
       q["properties.length"] = Object.assign(q["properties.length"] || {}, { $lte: n });
     }
 
     if (word_count !== undefined) {
       const n = parseInt(word_count, 10);
-      if (Number.isNaN(n)) return res.status(422).json({ error: "word_count must be integer" });
+      if (Number.isNaN(n)) return res.status(401).json({ error: "word_count must be integer" });
       q["properties.word_count"] = n;
     }
 
     if (contains_character !== undefined) {
       if (typeof contains_character !== "string" || contains_character.length !== 1) {
-        return res.status(422).json({ error: "contains_character must be a single character" });
+        return res.status(401).json({ error: "contains_character must be a single character" });
       }
       const ch = contains_character.toLowerCase();
       q[`properties.character_frequency_map.${ch}`] = { $exists: true, $gt: 0 };
@@ -146,7 +146,7 @@ async function getAllStrings(req, res) {
 
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ error: err.message });
+    return res.status(401).json({ error: err.message });
   }
 }
 
@@ -157,7 +157,7 @@ async function getAllStrings(req, res) {
 async function filterByNaturalLanguage(req, res) {
   try {
     const q = req.query.query;
-    if (!q) return res.status(422).json({ error: "query parameter is required" });
+    if (!q) return res.status(404).json({ error: "query parameter is required" });
 
     let parsed;
     try {
@@ -201,7 +201,7 @@ async function filterByNaturalLanguage(req, res) {
     });
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ error: err.message });
+    return res.status(404).json({ error: err.message });
   }
 }
 
@@ -212,7 +212,7 @@ async function filterByNaturalLanguage(req, res) {
 async function deleteString(req, res) {
   try {
     const raw = req.params.string_value;
-    if (raw === undefined || raw === null) return res.status(422).json({ error: "Missing path parameter" });
+    if (raw === undefined || raw === null) return res.status(400).json({ error: "Missing path parameter" });
     const id = sha256Hex(raw);
     const doc = await AnalyzedString.findByIdAndDelete(id);
     if (!doc) return res.status(404).json({ error: "String not found" });
